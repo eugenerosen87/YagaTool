@@ -85,7 +85,7 @@ exports.handler = async (event) => {
       headers: {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*',
-        'Cache-Control': 'public, s-maxage=600',
+        'Cache-Control': 'no-store',
       },
       body: JSON.stringify(results)
     };
@@ -101,7 +101,7 @@ exports.handler = async (event) => {
         headers: {
           'Content-Type': 'text/plain; charset=utf-8',
           'Access-Control-Allow-Origin': '*',
-          'Cache-Control': 'public, s-maxage=300',
+          'Cache-Control': 'no-store',
         },
         body
       };

@@ -235,7 +235,11 @@ function px(url) {
   return fetch('/proxy?url=' + encodeURIComponent(url))
     .then(r => { if (!r.ok) throw new Error('Proxy ' + r.status); return r.text(); });
 }
-function pxJson(url) { return px(url).then(t => JSON.parse(t)); }
+function pxJson(url) {
+  // Add cache-bust so Netlify CDN never serves stale responses
+  const sep = url.includes('?') ? '&' : '?';
+  return px(url + sep + '_t=' + Date.now()).then(t => JSON.parse(t));
+}
 
 // Decode HTML entities
 function decodeHtml(s) {
