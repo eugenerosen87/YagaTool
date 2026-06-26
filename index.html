@@ -382,37 +382,42 @@ async function go() {
     ));
     const stubs = pages.flat();
 
-    setP(28, `Fetching title & description for ${stubs.length} products...`);
+    // Step 3: show ALL products immediately from stubs, then enrich descriptions in background
+    products = stubs.map(s => ({ ...s, title: null, description: null, condition: null, category: null, _loaded: false }));
 
-    // Step 3: fetch EACH product page HTML — extract title + full description
-    const details = await batchMap(
-      stubs,
-      async stub => {
-        try {
-          const html = await px(`https://www.yaga.co.za/${slug}/product/${stub.slug}`);
-          return extractFromHtml(html);
-        } catch {
-          return { title: null, description: null, condition: null, category: null };
-        }
-      },
-      CONC,
-      (done, tot) => setP(28 + Math.round((done / tot) * 70), `Loading product details... ${done} / ${tot}`)
-    );
-
-    products = stubs.map((s, i) => ({ ...s, ...details[i] }));
-
-    setP(100, 'Done!');
-    setTimeout(() => { document.getElementById('prog').style.display = 'none'; }, 500);
-
-    // Stats
-    const priced = products.filter(p => p.price > 0);
-    const tv = products.reduce((s, p) => s + p.price, 0);
-    document.getElementById('sN').textContent = products.length;
-    document.getElementById('sV').textContent = 'R' + tv.toLocaleString('en-ZA');
-    document.getElementById('sA').textContent = priced.length ? 'R' + Math.round(tv / priced.length) : 'R0';
-    document.getElementById('sL').textContent = products.reduce((s, p) => s + (p.likeCount || 0), 0);
+    // Render immediately so user sees all products now
+    updateStats();
     document.getElementById('statsBar').style.display = 'block';
     document.getElementById('toolbar').style.display = 'flex';
+    render();
+
+    setP(30, `Loading descriptions for ${stubs.length} products...`);
+
+    // Now enrich in background batches of 8 — re-render after each batch
+    const BATCH = 8;
+    let enriched = 0;
+    for (let i = 0; i < products.length; i += BATCH) {
+      const batch = products.slice(i, i + BATCH);
+      await Promise.all(batch.map(async (prod) => {
+        try {
+          const html = await px(`https://www.yaga.co.za/${slug}/product/${prod.slug}`);
+          const detail = extractFromHtml(html);
+          prod.title = detail.title;
+          prod.description = detail.description;
+          prod.condition = detail.condition;
+          prod.category = detail.category;
+          prod._loaded = true;
+        } catch {
+          prod._loaded = true;
+        }
+      }));
+      enriched = Math.min(i + BATCH, products.length);
+      setP(30 + Math.round((enriched / products.length) * 68), `Loading descriptions... ${enriched} / ${products.length}`);
+      render(); // re-render with latest data after each batch
+    }
+
+    setP(100, `All ${products.length} products loaded!`);
+    setTimeout(() => { document.getElementById('prog').style.display = 'none'; }, 800);
     render();
 
   } catch (e) {
@@ -423,6 +428,15 @@ async function go() {
   }
   busy = false;
   document.getElementById('goBtn').disabled = false;
+}
+
+function updateStats() {
+  const priced = products.filter(p => p.price > 0);
+  const tv = products.reduce((s, p) => s + p.price, 0);
+  document.getElementById('sN').textContent = products.length;
+  document.getElementById('sV').textContent = 'R' + tv.toLocaleString('en-ZA');
+  document.getElementById('sA').textContent = priced.length ? 'R' + Math.round(tv / priced.length) : 'R0';
+  document.getElementById('sL').textContent = products.reduce((s, p) => s + (p.likeCount || 0), 0);
 }
 
 function showErr(msg) {
@@ -468,17 +482,17 @@ function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').repl
 function cardH(p) {
   const url = `https://www.yaga.co.za/${slug}/product/${p.slug}`;
   const img = p.images?.[0]?.thumbnail || '';
-  const title = p.title || '(no title)';
+  const title = p.title || (p._loaded ? '(no title)' : '');
   // Show first line of description as subtitle
-  const descLine = p.description ? p.description.split('\n')[0].trim() : '';
+  const descLine = p.description ? p.description.split('\n')[0].trim() : (!p._loaded ? 'Loading...' : '');
   const imgEl = img ? `<img src="${esc(img)}" alt="${esc(title)}" loading="lazy">` : `<div class="pc-ph">🛍️</div>`;
   const prEl = p.price === 0 ? `<span class="pr free">Free</span>` : `<span class="pr">R${p.price}</span>`;
   return `<a class="pc" href="${url}" target="_blank" rel="noopener">
     ${imgEl}
     <div class="pc-body">
       ${p.brand ? `<div class="pc-brand">${esc(p.brand)}</div>` : ''}
-      <div class="pc-title">${esc(title)}</div>
-      ${descLine ? `<div class="pc-desc">${esc(descLine)}</div>` : ''}
+      <div class="pc-title" style="${!title ? 'background:#f0ede8;height:11px;border-radius:4px;margin-bottom:6px' : ''}">${esc(title)}</div>
+      ${descLine ? `<div class="pc-desc" style="${!p._loaded ? 'color:#bbb' : ''}">${esc(descLine)}</div>` : ''}
       <div class="pc-foot">${prEl}<span class="lk">${hrt}${p.likeCount||0}</span></div>
     </div>
   </a>`;
@@ -487,16 +501,16 @@ function cardH(p) {
 function listH(p) {
   const url = `https://www.yaga.co.za/${slug}/product/${p.slug}`;
   const img = p.images?.[0]?.thumbnail || '';
-  const title = p.title || '(no title)';
-  const desc = p.description ? p.description.replace(/\n+/g, ' ').trim() : '';
+  const title = p.title || (p._loaded ? '(no title)' : '');
+  const desc = p.description ? p.description.replace(/\n+/g, ' ').trim() : (!p._loaded ? 'Loading description...' : '');
   const date = p.listedAt ? new Date(p.listedAt).toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'}) : '';
   const imgEl = img ? `<img src="${esc(img)}" alt="" loading="lazy">` : `<div class="pl-ph">🛍️</div>`;
   const prEl = p.price === 0 ? `<span class="pl-price free">Free</span>` : `<span class="pl-price">R${p.price}</span>`;
   return `<a class="pl" href="${url}" target="_blank" rel="noopener">
     ${imgEl}
     <div class="pl-info">
-      <div class="pl-title">${esc(title)}</div>
-      ${desc ? `<div class="pl-desc">${esc(desc)}</div>` : ''}
+      <div class="pl-title" style="${!title ? 'background:#f0ede8;height:11px;border-radius:4px;width:70%' : ''}">${esc(title)}</div>
+      ${desc ? `<div class="pl-desc" style="${!p._loaded ? 'color:#bbb' : ''}">${esc(desc)}</div>` : ''}
       <div class="pl-sub">${p.brand ? esc(p.brand)+' · ' : ''}${date}${p.condition ? ' · '+esc(p.condition) : ''}</div>
     </div>
     <div class="pl-right">
