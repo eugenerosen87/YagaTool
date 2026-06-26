@@ -371,16 +371,26 @@ async function go() {
   try {
     setP(5, 'Connecting to Yaga...');
 
-    // Fetch ALL products in one call — no pagination needed
-    const firstData = await pxJson(`https://www.yaga.co.za/api/product/?shopId=${encodeURIComponent(slug)}&status=published&offset=0&limit=3000`);
-
-    if (!firstData.data || !firstData.data.list || firstData.data.list.length === 0) {
+    // Step 1: get the real numeric shopId using a small call
+    const probe = await pxJson(`https://www.yaga.co.za/api/product/?shopId=${encodeURIComponent(slug)}&status=published&offset=0&limit=1`);
+    if (!probe.data || !probe.data.list || probe.data.list.length === 0) {
       throw new Error('No products found. Check the shop URL.');
     }
+    const shopId = probe.data.list[0].shopId;
+    const total = probe.data.total;
 
-    const shopId = firstData.data.list[0].shopId;
-    const total = firstData.data.total;
-    const stubs = firstData.data.list;
+    setP(10, `Found shop — loading all ${total} products...`);
+    document.getElementById('shopName').textContent = slug;
+    document.getElementById('shopSub').textContent = `${total} products`;
+    document.getElementById('shopInfo').style.display = 'block';
+    document.getElementById('main').innerHTML = skelGrid(total);
+
+    // Step 2: fetch ALL products in one call using numeric shopId
+    const allData = await pxJson(`https://www.yaga.co.za/api/product/?shopId=${shopId}&status=published&offset=0&limit=3000`);
+    if (!allData.data || !allData.data.list || allData.data.list.length === 0) {
+      throw new Error('Could not load products.');
+    }
+    const stubs = allData.data.list;
 
     setP(30, `Got ${stubs.length} products — loading descriptions...`);
     products = stubs.map(s => ({ ...s, title: null, description: null, condition: null, category: null, _loaded: false }));
