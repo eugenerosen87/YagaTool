@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Crafty and Bookish — Shop Browser</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --cream: #faf8f4; --ink: #1c1a17; --ink2: #4a4740; --ink3: #8a8680;
+    --rose: #c4614a; --sage: #4a6655; --border: #e8e4de; --card: #fff; --radius: 12px;
+  }
+  body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--ink); min-height: 100vh; }
+
+  .site-header { background: var(--ink); color: #fff; padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 60px; position: sticky; top: 0; z-index: 100; }
+  .brand { font-family: 'DM Serif Display', serif; font-size: 20px; color: #fff; text-decoration: none; }
+  .brand em { color: var(--rose); font-style: italic; }
+  .header-meta { font-size: 12px; color: rgba(255,255,255,0.4); }
+
+  .hero { background: var(--ink); color: #fff; padding: 3.5rem 2rem 3rem; text-align: center; }
+  .hero h1 { font-family: 'DM Serif Display', serif; font-size: clamp(2rem, 6vw, 3.2rem); line-height: 1.1; margin-bottom: 0.75rem; }
+  .hero h1 em { color: var(--rose); font-style: italic; }
+  .hero p { font-size: 15px; color: rgba(255,255,255,0.5); max-width: 460px; margin: 0 auto 2rem; line-height: 1.6; }
+
+  .fetch-btn { display: inline-flex; align-items: center; gap: 8px; background: var(--rose); color: #fff; border: none; border-radius: 50px; padding: 14px 28px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 500; cursor: pointer; transition: background 0.15s, transform 0.1s; }
+  .fetch-btn:hover { background: #b5553f; }
+  .fetch-btn:active { transform: scale(0.97); }
+  .fetch-btn:disabled { background: #555; cursor: default; }
+
+  .progress-section { background: var(--ink); padding: 0 2rem 2rem; display: none; }
+  .progress-track { height: 3px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; margin-bottom: 10px; }
+  .progress-fill { height: 100%; background: var(--rose); border-radius: 2px; width: 0%; transition: width 0.35s ease; }
+  .progress-label { font-size: 12px; color: rgba(255,255,255,0.45); text-align: center; }
+
+  .stats-bar { display: none; border-bottom: 1px solid var(--border); background: var(--card); }
+  .stats-inner { max-width: 1200px; margin: 0 auto; padding: 0 2rem; display: flex; flex-wrap: wrap; }
+  .stat-item { padding: 1rem 1.5rem 1rem 0; margin-right: 1.5rem; border-right: 1px solid var(--border); }
+  .stat-item:last-child { border-right: none; margin-right: 0; }
+  .stat-label { font-size: 11px; color: var(--ink3); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 3px; }
+  .stat-value { font-size: 22px; font-weight: 500; font-variant-numeric: tabular-nums; }
+
+  .toolbar { display: none; max-width: 1200px; margin: 0 auto; padding: 1.25rem 2rem; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .search-wrap { flex: 1; min-width: 200px; position: relative; }
+  .search-wrap svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--ink3); pointer-events: none; }
+  .search-wrap input { width: 100%; height: 40px; padding: 0 12px 0 38px; border: 1px solid var(--border); border-radius: 50px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--ink); background: var(--card); outline: none; transition: border-color 0.15s; }
+  .search-wrap input:focus { border-color: var(--rose); }
+  .search-wrap input::placeholder { color: var(--ink3); }
+  select.sort { height: 40px; padding: 0 14px; border: 1px solid var(--border); border-radius: 50px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--ink); background: var(--card); cursor: pointer; outline: none; }
+  .view-toggle { display: flex; border: 1px solid var(--border); border-radius: 50px; overflow: hidden; background: var(--card); }
+  .vbtn { width: 40px; height: 40px; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--ink3); }
+  .vbtn.active { background: var(--ink); color: #fff; }
+  .vbtn svg { width: 16px; height: 16px; }
+  .result-count { font-size: 13px; color: var(--ink3); white-space: nowrap; }
+  .export-btn { height: 40px; padding: 0 16px; border: 1px solid var(--border); border-radius: 50px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--ink2); background: var(--card); cursor: pointer; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+  .export-btn:hover { border-color: var(--ink); color: var(--ink); }
+  .export-btn svg { width: 15px; height: 15px; }
+
+  .main { max-width: 1200px; margin: 0 auto; padding: 1.5rem 2rem 3rem; }
+
+  /* Grid */
+  .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 16px; }
+  .pcard { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; transition: transform 0.15s, box-shadow 0.15s; text-decoration: none; color: inherit; display: block; }
+  .pcard:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+  .pcard-img { width: 100%; aspect-ratio: 1; object-fit: cover; background: #f0ede8; display: block; }
+  .pcard-placeholder { width: 100%; aspect-ratio: 1; background: #f0ede8; display: flex; align-items: center; justify-content: center; font-size: 36px; }
+  .pcard-body { padding: 12px 14px 14px; }
+  .pcard-brand { font-size: 10px; color: var(--ink3); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 3px; }
+  .pcard-title { font-size: 13px; font-weight: 500; line-height: 1.4; margin-bottom: 8px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.8em; }
+  .pcard-meta { display: flex; align-items: center; justify-content: space-between; }
+  .price { font-size: 15px; font-weight: 500; }
+  .price.free { color: var(--sage); }
+  .likes { font-size: 12px; color: var(--ink3); display: flex; align-items: center; gap: 3px; }
+  .likes svg { width: 12px; height: 12px; }
+
+  /* List */
+  .product-list { display: flex; flex-direction: column; gap: 6px; }
+  .plist { background: var(--card); border: 1px solid var(--border); border-radius: 10px; display: flex; align-items: center; gap: 14px; padding: 10px 14px; text-decoration: none; color: inherit; transition: background 0.1s; }
+  .plist:hover { background: #fdfcfa; }
+  .plist-thumb { width: 52px; height: 52px; border-radius: 8px; object-fit: cover; flex-shrink: 0; background: #f0ede8; display: block; }
+  .plist-placeholder { width: 52px; height: 52px; border-radius: 8px; background: #f0ede8; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+  .plist-info { flex: 1; min-width: 0; }
+  .plist-title { font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .plist-sub { font-size: 12px; color: var(--ink3); margin-top: 2px; }
+  .plist-price { font-size: 15px; font-weight: 500; white-space: nowrap; flex-shrink: 0; }
+  .plist-price.free { color: var(--sage); }
+  .plist-likes { font-size: 12px; color: var(--ink3); white-space: nowrap; flex-shrink: 0; display: flex; align-items: center; gap: 3px; min-width: 36px; justify-content: flex-end; }
+  .plist-likes svg { width: 12px; height: 12px; }
+  .plist-arrow { color: var(--ink3); flex-shrink: 0; }
+  .plist-arrow svg { width: 16px; height: 16px; }
+
+  /* Loading skeleton */
+  .skeleton-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 16px; }
+  .skeleton-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  .skeleton-img { width: 100%; aspect-ratio: 1; background: linear-gradient(90deg, #f0ede8 25%, #e8e4de 50%, #f0ede8 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; }
+  .skeleton-body { padding: 12px 14px 14px; }
+  .skeleton-line { height: 12px; border-radius: 6px; background: linear-gradient(90deg, #f0ede8 25%, #e8e4de 50%, #f0ede8 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; margin-bottom: 8px; }
+  .skeleton-line.short { width: 60%; }
+  @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+  .error-msg { background: #fff0ee; border: 1px solid #f5c4b3; border-radius: 10px; padding: 1.25rem 1.5rem; color: #993c1d; font-size: 14px; line-height: 1.6; }
+  .error-msg strong { display: block; margin-bottom: 4px; font-size: 15px; }
+
+  @media (max-width: 640px) {
+    .site-header { padding: 0 1rem; }
+    .hero { padding: 2.5rem 1rem 2rem; }
+    .main { padding: 1rem 1rem 2rem; }
+    .stats-inner { padding: 0 1rem; }
+    .toolbar { padding: 1rem; }
+    .stat-item { border-right: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <a class="brand" href="#">Crafty <em>&</em> Bookish</a>
+  <span class="header-meta">Yaga · Parkview, Gauteng</span>
+</header>
+
+<section class="hero">
+  <h1>Pre-loved books, puzzles<br>& <em>crafty finds</em></h1>
+  <p>Every listing from Jacqui's Yaga shop — searchable and sortable, no endless scrolling.</p>
+  <button class="fetch-btn" id="fetchBtn" onclick="startFetch()">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    Load all products
+  </button>
+</section>
+
+<div class="progress-section" id="progressSection">
+  <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="progress-label" id="progressLabel">Starting...</div>
+</div>
+
+<div class="stats-bar" id="statsBar">
+  <div class="stats-inner">
+    <div class="stat-item"><div class="stat-label">Products</div><div class="stat-value" id="sTotal">—</div></div>
+    <div class="stat-item"><div class="stat-label">Total value</div><div class="stat-value" id="sValue">—</div></div>
+    <div class="stat-item"><div class="stat-label">Avg price</div><div class="stat-value" id="sAvg">—</div></div>
+    <div class="stat-item"><div class="stat-label">Total likes</div><div class="stat-value" id="sLikes">—</div></div>
+  </div>
+</div>
+
+<div class="toolbar" id="toolbar">
+  <div class="search-wrap">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" id="search" placeholder="Search products..." oninput="render()">
+  </div>
+  <select class="sort" id="sortSel" onchange="render()">
+    <option value="listedAt_desc">Newest first</option>
+    <option value="listedAt_asc">Oldest first</option>
+    <option value="price_asc">Price: low to high</option>
+    <option value="price_desc">Price: high to low</option>
+    <option value="likeCount_desc">Most liked</option>
+    <option value="title_asc">Title A–Z</option>
+  </select>
+  <div class="view-toggle">
+    <button class="vbtn active" id="gridBtn" onclick="setView('grid')" title="Grid view">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+    </button>
+    <button class="vbtn" id="listBtn" onclick="setView('list')" title="List view">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+    </button>
+  </div>
+  <span class="result-count" id="resultCount"></span>
+  <button class="export-btn" onclick="exportCSV()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+    Export CSV
+  </button>
+</div>
+
+<main class="main" id="main"></main>
+
+<script>
+const SHOP_ID = 103695607;
+const SHOP_SLUG = 'craftyandbookish';
+const LIMIT = 32;
+const CONCURRENCY = 10;
+
+let allProducts = [];
+let viewMode = 'grid';
+let fetching = false;
+
+// All API calls go through /api/ → Netlify function → Yaga
+function apiFetch(path, params = {}) {
+  const qs = new URLSearchParams(params).toString();
+  const url = `/api/${path}${qs ? '?' + qs : ''}`;
+  return fetch(url).then(r => {
+    if (!r.ok) throw new Error(`HTTP ${r.status} for ${url}`);
+    return r.json();
+  });
+}
+
+function fetchPage(offset) {
+  return apiFetch('product/', { shopId: SHOP_ID, status: 'published', offset, limit: LIMIT })
+    .then(d => d.data);
+}
+
+// Fetch individual product page to get title, description etc
+function fetchProduct(slug) {
+  return apiFetch(`product/${slug}`)
+    .then(d => d.data || null)
+    .catch(() => null);
+}
+
+async function batchMap(items, fn, concurrency, onProgress) {
+  const results = new Array(items.length);
+  let idx = 0, done = 0;
+  async function worker() {
+    while (idx < items.length) {
+      const i = idx++;
+      results[i] = await fn(items[i]);
+      onProgress && onProgress(++done, items.length);
+    }
+  }
+  await Promise.all(Array.from({ length: Math.min(concurrency, items.length) }, worker));
+  return results;
+}
+
+function setProgress(pct, label) {
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent = label;
+}
+
+function showSkeletons(n) {
+  const grid = Array.from({ length: n }, () => `
+    <div class="skeleton-card">
+      <div class="skeleton-img"></div>
+      <div class="skeleton-body">
+        <div class="skeleton-line short"></div>
+        <div class="skeleton-line"></div>
+        <div class="skeleton-line short"></div>
+      </div>
+    </div>`).join('');
+  document.getElementById('main').innerHTML = `<div class="skeleton-grid">${grid}</div>`;
+}
+
+async function startFetch() {
+  if (fetching) return;
+  fetching = true;
+  document.getElementById('fetchBtn').disabled = true;
+  document.getElementById('progressSection').style.display = 'block';
+  setProgress(2, 'Connecting to Yaga...');
+
+  try {
+    // Step 1: get all slugs across all pages
+    const first = await fetchPage(0);
+    const total = first.total;
+    const offsets = Array.from({ length: Math.ceil(total / LIMIT) }, (_, i) => i * LIMIT);
+
+    setProgress(8, `Found ${total} products — fetching all pages...`);
+    showSkeletons(Math.min(total, 32));
+
+    const pages = await Promise.all(offsets.map(o => fetchPage(o)));
+    const stubs = pages.flatMap(p => p.list);
+
+    setProgress(20, `Fetching full details for ${stubs.length} products...`);
+
+    // Step 2: hit each individual product URL to get title + description
+    const details = await batchMap(
+      stubs,
+      stub => fetchProduct(stub.slug),
+      CONCURRENCY,
+      (done, tot) => {
+        const pct = 20 + Math.round((done / tot) * 78);
+        setProgress(pct, `Loading product details... ${done} / ${tot}`);
+      }
+    );
+
+    // Merge stub data with full detail
+    allProducts = stubs.map((stub, i) => {
+      const detail = details[i] || {};
+      return {
+        ...stub,
+        title: detail.title || detail.name || null,
+        description: detail.description || null,
+        condition: detail.condition || null,
+        category: detail.category || detail.categoryName || null,
+      };
+    });
+
+    setProgress(100, 'Done!');
+    setTimeout(() => { document.getElementById('progressSection').style.display = 'none'; }, 600);
+
+    updateStats();
+    document.getElementById('statsBar').style.display = 'block';
+    document.getElementById('toolbar').style.display = 'flex';
+    render();
+
+  } catch (e) {
+    setProgress(0, '');
+    document.getElementById('main').innerHTML = `<div class="error-msg">
+      <strong>Could not load products</strong>
+      ${e.message}
+    </div>`;
+    console.error(e);
+  }
+
+  fetching = false;
+  document.getElementById('fetchBtn').disabled = false;
+}
+
+function updateStats() {
+  const priced = allProducts.filter(p => p.price > 0);
+  const totalVal = allProducts.reduce((s, p) => s + p.price, 0);
+  const likes = allProducts.reduce((s, p) => s + (p.likeCount || 0), 0);
+  document.getElementById('sTotal').textContent = allProducts.length;
+  document.getElementById('sValue').textContent = 'R' + totalVal.toLocaleString('en-ZA');
+  document.getElementById('sAvg').textContent = priced.length ? 'R' + Math.round(totalVal / priced.length) : 'R0';
+  document.getElementById('sLikes').textContent = likes;
+}
+
+function setView(v) {
+  viewMode = v;
+  document.getElementById('gridBtn').classList.toggle('active', v === 'grid');
+  document.getElementById('listBtn').classList.toggle('active', v === 'list');
+  render();
+}
+
+function render() {
+  const q = document.getElementById('search').value.toLowerCase();
+  const [sf, sd] = document.getElementById('sortSel').value.split('_');
+
+  let list = allProducts.filter(p =>
+    !q ||
+    (p.title || '').toLowerCase().includes(q) ||
+    (p.description || '').toLowerCase().includes(q) ||
+    (p.brand || '').toLowerCase().includes(q) ||
+    (p.category || '').toLowerCase().includes(q)
+  );
+
+  list.sort((a, b) => {
+    let av = sf === 'listedAt' ? new Date(a[sf]) : sf === 'title' ? (a[sf] || a.slug || '').toLowerCase() : (a[sf] || 0);
+    let bv = sf === 'listedAt' ? new Date(b[sf]) : sf === 'title' ? (b[sf] || b.slug || '').toLowerCase() : (b[sf] || 0);
+    return sd === 'asc' ? (av > bv ? 1 : -1) : (av < bv ? 1 : -1);
+  });
+
+  document.getElementById('resultCount').textContent = `${list.length} of ${allProducts.length}`;
+
+  const main = document.getElementById('main');
+  if (!list.length) {
+    main.innerHTML = `<div style="text-align:center;padding:4rem 2rem;color:var(--ink3);font-size:15px">No products match your search.</div>`;
+    return;
+  }
+
+  main.innerHTML = viewMode === 'grid'
+    ? `<div class="product-grid">${list.map(cardHTML).join('')}</div>`
+    : `<div class="product-list">${list.map(listHTML).join('')}</div>`;
+}
+
+const heartSVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`;
+const arrowSVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>`;
+
+function esc(s) {
+  return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function cardHTML(p) {
+  const url = `https://www.yaga.co.za/${SHOP_SLUG}/${p.slug}`;
+  const img = p.images?.[0]?.thumbnail || '';
+  const title = p.title || '(no title)';
+  const imgEl = img ? `<img class="pcard-img" src="${img}" alt="${esc(title)}" loading="lazy">` : `<div class="pcard-placeholder">🎀</div>`;
+  const priceEl = p.price === 0 ? `<span class="price free">Free</span>` : `<span class="price">R${p.price}</span>`;
+  return `<a class="pcard" href="${url}" target="_blank" rel="noopener">
+    ${imgEl}
+    <div class="pcard-body">
+      ${p.brand ? `<div class="pcard-brand">${esc(p.brand)}</div>` : ''}
+      <div class="pcard-title">${esc(title)}</div>
+      <div class="pcard-meta">${priceEl}<span class="likes">${heartSVG} ${p.likeCount||0}</span></div>
+    </div>
+  </a>`;
+}
+
+function listHTML(p) {
+  const url = `https://www.yaga.co.za/${SHOP_SLUG}/${p.slug}`;
+  const img = p.images?.[0]?.thumbnail || '';
+  const title = p.title || '(no title)';
+  const date = p.listedAt ? new Date(p.listedAt).toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'}) : '';
+  const imgEl = img ? `<img class="plist-thumb" src="${img}" alt="" loading="lazy">` : `<div class="plist-placeholder">🎀</div>`;
+  const priceEl = p.price === 0 ? `<span class="plist-price free">Free</span>` : `<span class="plist-price">R${p.price}</span>`;
+  return `<a class="plist" href="${url}" target="_blank" rel="noopener">
+    ${imgEl}
+    <div class="plist-info">
+      <div class="plist-title">${esc(title)}</div>
+      <div class="plist-sub">${p.brand ? esc(p.brand)+' · ' : ''}${date}</div>
+    </div>
+    ${priceEl}
+    <span class="plist-likes">${heartSVG} ${p.likeCount||0}</span>
+    <span class="plist-arrow">${arrowSVG}</span>
+  </a>`;
+}
+
+function exportCSV() {
+  const rows = [['Title','Price','Likes','Brand','Category','Listed','URL']];
+  allProducts.forEach(p => rows.push([
+    `"${(p.title||p.slug||'').replace(/"/g,'""')}"`,
+    p.price, p.likeCount||0,
+    `"${(p.brand||'').replace(/"/g,'""')}"`,
+    `"${(p.category||'').replace(/"/g,'""')}"`,
+    p.listedAt ? new Date(p.listedAt).toLocaleDateString('en-ZA') : '',
+    `https://www.yaga.co.za/${SHOP_SLUG}/${p.slug}`
+  ]));
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([rows.map(r=>r.join(',')).join('\n')],{type:'text/csv'}));
+  a.download = 'craftyandbookish.csv';
+  a.click();
+}
+</script>
+</body>
+</html>
