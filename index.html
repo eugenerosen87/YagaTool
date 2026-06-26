@@ -231,14 +231,25 @@ let slug = '';
 let view = 'grid';
 let busy = false;
 
+// Extract Bearer token from Yaga's token cookie
+function getYagaAuth() {
+  const m = document.cookie.match(/(?:^|;\s*)token=([^;]+)/);
+  if (m) return decodeURIComponent(m[1]); // returns "Bearer eyJ..."
+  return '';
+}
+
+function authHeaders() {
+  const auth = getYagaAuth();
+  return auth ? { 'x-yaga-auth': auth } : {};
+}
+
 function px(url) {
-  return fetch('/proxy?url=' + encodeURIComponent(url))
+  return fetch('/proxy?url=' + encodeURIComponent(url), { headers: authHeaders() })
     .then(r => { if (!r.ok) throw new Error('Proxy ' + r.status); return r.text(); });
 }
 function pxJson(url) {
-  // Add cache-bust so Netlify CDN never serves stale responses
   const sep = url.includes('?') ? '&' : '?';
-  return px(url + sep + '_t=' + Date.now()).then(t => JSON.parse(t));
+  return px(url + sep + '_=' + Math.random()).then(t => JSON.parse(t));
 }
 
 // Decode HTML entities
@@ -357,22 +368,35 @@ async function go() {
   setP(3, 'Connecting to Yaga...');
 
   try {
-    // Single call — proxy fetches ALL pages server-side and returns everything
-    setP(10, 'Loading all products...');
-    const result = await fetch(`/proxy?mode=shop&slug=${encodeURIComponent(slug)}`).then(r => r.json());
+    setP(5, 'Connecting to Yaga...');
 
-    if (result.error) throw new Error(result.error);
+    // Fetch page 0 via proxy to get shopId and total
+    const firstData = await pxJson(`https://www.yaga.co.za/api/product/?shopId=${encodeURIComponent(slug)}&status=published&offset=0&limit=32`);
 
-    const stubs = result.products;
-    const total = result.total;
+    if (!firstData.data || !firstData.data.list || firstData.data.list.length === 0) {
+      throw new Error('No products found. Check the shop URL.');
+    }
 
-    if (!stubs || stubs.length === 0) throw new Error('No products found. Check the shop URL.');
+    const shopId = firstData.data.list[0].shopId;
+    const total = firstData.data.total;
+    const stubs = [...firstData.data.list];
 
-    // Show shop info
+    // Show shop info immediately
     document.getElementById('shopName').textContent = slug;
-    document.getElementById('shopSub').textContent = `${stubs.length} products`;
+    document.getElementById('shopSub').textContent = `${total} products`;
     document.getElementById('shopInfo').style.display = 'block';
-    document.getElementById('main').innerHTML = skelGrid(stubs.length);
+    document.getElementById('main').innerHTML = skelGrid(total);
+    setP(15, `${total} products — loading page 1 of ${Math.ceil(total/32)}...`);
+
+    // Fetch remaining pages from the browser (one proxy call each)
+    for (let offset = 32; offset < total; offset += 32) {
+      const pageData = await pxJson(`https://www.yaga.co.za/api/product/?shopId=${shopId}&status=published&offset=${offset}&limit=32`);
+      if (pageData.data && pageData.data.list) {
+        stubs.push(...pageData.data.list);
+      }
+      const pageNum = Math.floor(offset / 32) + 1;
+      setP(15 + Math.round((stubs.length / total) * 15), `Loading page ${pageNum} of ${Math.ceil(total/32)}... ${stubs.length} / ${total}`);
+    }
 
     setP(30, `Got ${stubs.length} products — loading descriptions...`);
     products = stubs.map(s => ({ ...s, title: null, description: null, condition: null, category: null, _loaded: false }));
@@ -393,7 +417,7 @@ async function go() {
       const batch = products.slice(i, i + BATCH);
       const slugList = batch.map(p => p.slug).join(',');
       try {
-        const results = await fetch(`/proxy?slugs=${encodeURIComponent(slugList)}&shop=${encodeURIComponent(slug)}`)
+        const results = await fetch(`/proxy?slugs=${encodeURIComponent(slugList)}&shop=${encodeURIComponent(slug)}`, { headers: authHeaders() })
           .then(r => r.json());
         // Map results back to products by slug
         const bySlug = {};
