@@ -116,7 +116,12 @@ exports.handler = async (event) => {
     if (!p.url.includes('yaga.co.za')) return { statusCode: 403, headers: CORS, body: 'Only yaga.co.za' };
     try {
       const body = await get(p.url, auth);
-      return { statusCode: 200, headers: { ...CORS, 'Content-Type': 'text/plain; charset=utf-8' }, body };
+      const isJson = p.url.includes('/api/');
+      return {
+        statusCode: 200,
+        headers: { ...CORS, 'Content-Type': isJson ? 'application/json' : 'text/plain; charset=utf-8' },
+        body
+      };
     } catch (e) {
       return { statusCode: 500, headers: CORS, body: JSON.stringify({ error: e.message }) };
     }

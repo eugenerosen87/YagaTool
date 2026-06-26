@@ -248,8 +248,9 @@ function px(url) {
     .then(r => { if (!r.ok) throw new Error('Proxy ' + r.status); return r.text(); });
 }
 function pxJson(url) {
-  const sep = url.includes('?') ? '&' : '?';
-  return px(url + sep + '_=' + Math.random()).then(t => JSON.parse(t));
+  // Pass a unique cache-buster as a TOP-LEVEL proxy param so Netlify CDN sees a unique URL
+  return fetch('/proxy?_=' + Date.now() + '&url=' + encodeURIComponent(url), { headers: authHeaders() })
+    .then(r => { if (!r.ok) throw new Error('Proxy ' + r.status); return r.json(); });
 }
 
 // Decode HTML entities
@@ -370,8 +371,8 @@ async function go() {
   try {
     setP(5, 'Connecting to Yaga...');
 
-    // Fetch page 0 via proxy to get shopId and total
-    const firstData = await pxJson(`https://www.yaga.co.za/api/product/?shopId=${encodeURIComponent(slug)}&status=published&offset=0&limit=32`);
+    // Fetch ALL products in one call — no pagination needed
+    const firstData = await pxJson(`https://www.yaga.co.za/api/product/?shopId=${encodeURIComponent(slug)}&status=published&offset=0&limit=3000`);
 
     if (!firstData.data || !firstData.data.list || firstData.data.list.length === 0) {
       throw new Error('No products found. Check the shop URL.');
@@ -379,24 +380,7 @@ async function go() {
 
     const shopId = firstData.data.list[0].shopId;
     const total = firstData.data.total;
-    const stubs = [...firstData.data.list];
-
-    // Show shop info immediately
-    document.getElementById('shopName').textContent = slug;
-    document.getElementById('shopSub').textContent = `${total} products`;
-    document.getElementById('shopInfo').style.display = 'block';
-    document.getElementById('main').innerHTML = skelGrid(total);
-    setP(15, `${total} products — loading page 1 of ${Math.ceil(total/32)}...`);
-
-    // Fetch remaining pages from the browser (one proxy call each)
-    for (let offset = 32; offset < total; offset += 32) {
-      const pageData = await pxJson(`https://www.yaga.co.za/api/product/?shopId=${shopId}&status=published&offset=${offset}&limit=32`);
-      if (pageData.data && pageData.data.list) {
-        stubs.push(...pageData.data.list);
-      }
-      const pageNum = Math.floor(offset / 32) + 1;
-      setP(15 + Math.round((stubs.length / total) * 15), `Loading page ${pageNum} of ${Math.ceil(total/32)}... ${stubs.length} / ${total}`);
-    }
+    const stubs = firstData.data.list;
 
     setP(30, `Got ${stubs.length} products — loading descriptions...`);
     products = stubs.map(s => ({ ...s, title: null, description: null, condition: null, category: null, _loaded: false }));
