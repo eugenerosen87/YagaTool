@@ -357,49 +357,24 @@ async function go() {
   setP(3, 'Connecting to Yaga...');
 
   try {
-    // Step 1: use shopSlug API to get first page — shopId is in every product's shopId field
-    const firstUrl = `https://www.yaga.co.za/api/product/?shopSlug=${encodeURIComponent(slug)}&status=published&offset=0&limit=${LIMIT}`;
-    const first = await pxJson(firstUrl);
-    if (!first.data || !first.data.list || first.data.list.length === 0) {
-      throw new Error('No products found. Check the shop URL.');
-    }
+    // Single call — proxy fetches ALL pages server-side and returns everything
+    setP(10, 'Loading all products...');
+    const result = await fetch(`/proxy?mode=shop&slug=${encodeURIComponent(slug)}`).then(r => r.json());
 
-    // Extract shopId from the first product
-    const shopId = first.data.list[0].shopId;
-    const total = first.data.total;
-    const stubs = [...first.data.list];
+    if (result.error) throw new Error(result.error);
 
-    // Show basic shop info from what we know
+    const stubs = result.products;
+    const total = result.total;
+
+    if (!stubs || stubs.length === 0) throw new Error('No products found. Check the shop URL.');
+
+    // Show shop info
     document.getElementById('shopName').textContent = slug;
-    document.getElementById('shopSub').textContent = `${total} products`;
+    document.getElementById('shopSub').textContent = `${stubs.length} products`;
     document.getElementById('shopInfo').style.display = 'block';
+    document.getElementById('main').innerHTML = skelGrid(stubs.length);
 
-    document.getElementById('main').innerHTML = skelGrid(total);
-    setP(15, `${total} products found — loading all pages...`);
-
-    // Step 2: fetch remaining pages using shopId (reliable) sequentially
-    for (let offset = LIMIT; offset < total; offset += LIMIT) {
-      const page = await pxJson(`https://www.yaga.co.za/api/product/?shopId=${shopId}&status=published&offset=${offset}&limit=${LIMIT}`);
-      stubs.push(...page.data.list);
-      setP(15 + Math.round((stubs.length / total) * 15), `Loading products... ${stubs.length} / ${total}`);
-    }
-
-    // Step 3: load shop info from og tags in parallel (non-blocking)
-    px(`https://www.yaga.co.za/${slug}`).then(html => {
-      const nameM = html.match(/property=["']og:image:alt["'][^>]+content=["']([^"']+)["']/i)
-                 || html.match(/content=["']([^"']+)["'][^>]+property=["']og:image:alt["']/i);
-      const locM = html.match(/["']province["']\s*:\s*["']([^"']+)["']/);
-      const locM2 = html.match(/["']location["']\s*:\s*["']([^"']+)["']/);
-      const ordM = html.match(/["']completedOrdersCount["']\s*:\s*["']([^"']+)["']/);
-      const ratM = html.match(/["']avgRating["']\s*:\s*([\d.]+)/);
-      const picM = html.match(/["']picture["']\s*:\s*["']([^"']+)["']/);
-      if (nameM) document.getElementById('shopName').textContent = nameM[1];
-      const parts = [locM2?.[1], locM?.[1], ordM ? ordM[1]+' orders' : '', ratM ? '★ '+ratM[1] : ''].filter(Boolean);
-      document.getElementById('shopSub').textContent = parts.join(' · ');
-      if (picM) document.getElementById('shopAvatar').src = picM[1];
-    }).catch(() => {});
-
-    // Step 3: show ALL products immediately from stubs, then enrich descriptions in background
+    setP(30, `Got ${stubs.length} products — loading descriptions...`);
     products = stubs.map(s => ({ ...s, title: null, description: null, condition: null, category: null, _loaded: false }));
 
     // Render immediately so user sees all products now
