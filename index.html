@@ -369,23 +369,23 @@ async function go() {
   setP(3, 'Connecting to Yaga...');
 
   try {
-    setP(5, 'Connecting to Yaga...');
+    setP(5, 'Loading shop...');
 
-    // Step 1: get the real numeric shopId using a small call
-    const probe = await pxJson(`https://www.yaga.co.za/api/product/?shopId=${encodeURIComponent(slug)}&status=published&offset=0&limit=1`);
-    if (!probe.data || !probe.data.list || probe.data.list.length === 0) {
-      throw new Error('No products found. Check the shop URL.');
-    }
-    const shopId = probe.data.list[0].shopId;
-    const total = probe.data.total;
+    // Get shopId from the shop page __NEXT_DATA__ initialProducts
+    const shopHtml = await px(`https://www.yaga.co.za/${slug}`);
+    const ndM = shopHtml.match(/"shopId"\s*:\s*(\d+)/);
+    if (!ndM) throw new Error('Could not find shop. Check the URL.');
+    const shopId = ndM[1];
+    const totalM = shopHtml.match(/"total"\s*:\s*(\d+)/);
+    const total = totalM ? parseInt(totalM[1]) : '?';
 
-    setP(10, `Found shop — loading all ${total} products...`);
+    setP(15, `Loading all ${total} products...`);
     document.getElementById('shopName').textContent = slug;
     document.getElementById('shopSub').textContent = `${total} products`;
     document.getElementById('shopInfo').style.display = 'block';
-    document.getElementById('main').innerHTML = skelGrid(total);
+    document.getElementById('main').innerHTML = skelGrid(total || 32);
 
-    // Step 2: fetch ALL products in one call using numeric shopId
+    // Fetch ALL products in one call
     const allData = await pxJson(`https://www.yaga.co.za/api/product/?shopId=${shopId}&status=published&offset=0&limit=3000`);
     if (!allData.data || !allData.data.list || allData.data.list.length === 0) {
       throw new Error('Could not load products.');
