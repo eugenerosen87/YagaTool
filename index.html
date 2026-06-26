@@ -373,19 +373,20 @@ async function go() {
 
     setP(10, `Found "${shopName}" — fetching all products...`);
 
-    // Step 2: paginate through all product stubs
+    // Step 2: paginate through all product stubs SEQUENTIALLY to avoid rate limiting
     const first = await pxJson(`https://www.yaga.co.za/api/product/?shopId=${shopId}&status=published&offset=0&limit=${LIMIT}`);
     const total = first.data.total;
-    const offsets = Array.from({length: Math.ceil(total / LIMIT)}, (_, i) => i * LIMIT);
+    const stubs = [...first.data.list];
 
     document.getElementById('main').innerHTML = skelGrid(total);
-    setP(18, `${total} products — loading pages...`);
+    setP(18, `${total} products total — loading page 1 of ${Math.ceil(total/LIMIT)}...`);
 
-    const pages = await Promise.all(offsets.map(o =>
-      pxJson(`https://www.yaga.co.za/api/product/?shopId=${shopId}&status=published&offset=${o}&limit=${LIMIT}`)
-        .then(d => d.data.list)
-    ));
-    const stubs = pages.flat();
+    // Fetch remaining pages one at a time
+    for (let offset = LIMIT; offset < total; offset += LIMIT) {
+      const page = await pxJson(`https://www.yaga.co.za/api/product/?shopId=${shopId}&status=published&offset=${offset}&limit=${LIMIT}`);
+      stubs.push(...page.data.list);
+      setP(18 + Math.round((stubs.length / total) * 12), `Loading products... ${stubs.length} / ${total}`);
+    }
 
     // Step 3: show ALL products immediately from stubs, then enrich descriptions in background
     products = stubs.map(s => ({ ...s, title: null, description: null, condition: null, category: null, _loaded: false }));
