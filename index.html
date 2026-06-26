@@ -8,192 +8,188 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    --cream: #faf8f4; --ink: #1c1a17; --ink2: #4a4740; --ink3: #8a8680;
-    --rose: #c4614a; --sage: #4a6655; --border: #e8e4de; --card: #fff; --r: 12px;
-  }
-  body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--ink); min-height: 100vh; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --cream: #faf8f4; --ink: #1c1a17; --ink2: #4a4740; --ink3: #8a8680;
+  --rose: #c4614a; --sage: #4a6655; --border: #e8e4de; --card: #fff; --r: 12px;
+}
+body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--ink); min-height: 100vh; }
 
-  /* ── HEADER ── */
-  .hdr { background: var(--ink); color: #fff; padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 58px; position: sticky; top: 0; z-index: 100; }
-  .hdr-brand { font-family: 'DM Serif Display', serif; font-size: 19px; color: #fff; text-decoration: none; }
-  .hdr-brand em { color: var(--rose); font-style: italic; }
+/* HEADER */
+.hdr { background: var(--ink); padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; height: 56px; position: sticky; top: 0; z-index: 100; }
+.brand { font-family: 'DM Serif Display', serif; font-size: 18px; color: #fff; text-decoration: none; }
+.brand em { color: var(--rose); font-style: italic; }
 
-  /* ── URL BAR ── */
-  .url-section { background: var(--ink); border-top: 1px solid rgba(255,255,255,0.08); padding: 1.25rem 2rem; }
-  .url-row { max-width: 760px; margin: 0 auto; display: flex; gap: 10px; align-items: center; }
-  .url-input {
-    flex: 1; height: 44px; padding: 0 16px;
-    border: 1.5px solid rgba(255,255,255,0.15); border-radius: 50px;
-    background: rgba(255,255,255,0.07); color: #fff;
-    font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none;
-    transition: border-color 0.15s;
-  }
-  .url-input::placeholder { color: rgba(255,255,255,0.35); }
-  .url-input:focus { border-color: var(--rose); }
-  .go-btn {
-    height: 44px; padding: 0 22px; border: none; border-radius: 50px;
-    background: var(--rose); color: #fff; font-family: 'DM Sans', sans-serif;
-    font-size: 14px; font-weight: 500; cursor: pointer; white-space: nowrap;
-    display: flex; align-items: center; gap: 7px; transition: background 0.15s, transform 0.1s;
-  }
-  .go-btn:hover { background: #b5553f; }
-  .go-btn:active { transform: scale(0.97); }
-  .go-btn:disabled { background: #555; cursor: default; }
-  .url-hint { max-width: 760px; margin: 8px auto 0; font-size: 12px; color: rgba(255,255,255,0.35); }
+/* URL BAR */
+.urlbar { background: var(--ink); border-top: 1px solid rgba(255,255,255,0.07); padding: 1rem 2rem 1.25rem; }
+.urlrow { max-width: 800px; margin: 0 auto; display: flex; gap: 8px; }
+.urlinput {
+  flex: 1; height: 42px; padding: 0 16px;
+  border: 1.5px solid rgba(255,255,255,0.15); border-radius: 8px;
+  background: rgba(255,255,255,0.06); color: #fff;
+  font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none;
+}
+.urlinput::placeholder { color: rgba(255,255,255,0.3); }
+.urlinput:focus { border-color: var(--rose); }
+.gobtn {
+  height: 42px; padding: 0 20px; border: none; border-radius: 8px;
+  background: var(--rose); color: #fff; font-family: 'DM Sans', sans-serif;
+  font-size: 14px; font-weight: 500; cursor: pointer; white-space: nowrap;
+  transition: background 0.15s;
+}
+.gobtn:hover { background: #b5553f; }
+.gobtn:disabled { background: #555; cursor: default; }
+.urlhint { max-width: 800px; margin: 6px auto 0; font-size: 12px; color: rgba(255,255,255,0.3); }
 
-  /* ── PROGRESS ── */
-  .prog-wrap { background: var(--ink); padding: 0 2rem 1.5rem; display: none; }
-  .prog-track { height: 3px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; margin-bottom: 8px; }
-  .prog-fill { height: 100%; background: var(--rose); border-radius: 2px; width: 0%; transition: width 0.35s ease; }
-  .prog-label { font-size: 12px; color: rgba(255,255,255,0.4); text-align: center; }
+/* PROGRESS */
+.prog { background: var(--ink); padding: 0 2rem 1.25rem; display: none; }
+.prog-track { height: 3px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; margin-bottom: 7px; }
+.prog-fill { height: 100%; background: var(--rose); width: 0%; transition: width 0.3s; }
+.prog-label { font-size: 12px; color: rgba(255,255,255,0.4); text-align: center; }
 
-  /* ── SHOP META ── */
-  .shop-meta { display: none; background: var(--card); border-bottom: 1px solid var(--border); padding: 1rem 2rem; }
-  .shop-meta-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; gap: 14px; }
-  .shop-avatar { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border); flex-shrink: 0; }
-  .shop-name { font-size: 16px; font-weight: 500; }
-  .shop-sub { font-size: 13px; color: var(--ink3); margin-top: 1px; }
+/* SHOP INFO */
+.shopinfo { display: none; background: var(--card); border-bottom: 1px solid var(--border); padding: 0.9rem 2rem; }
+.shopinfo-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; gap: 12px; }
+.shopavatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--border); flex-shrink: 0; background: #f0ede8; }
+.shopname { font-size: 15px; font-weight: 500; }
+.shopsub { font-size: 12px; color: var(--ink3); margin-top: 1px; }
 
-  /* ── STATS ── */
-  .stats-bar { display: none; background: var(--card); border-bottom: 1px solid var(--border); }
-  .stats-inner { max-width: 1200px; margin: 0 auto; padding: 0 2rem; display: flex; flex-wrap: wrap; }
-  .stat { padding: 0.9rem 1.5rem 0.9rem 0; margin-right: 1.5rem; border-right: 1px solid var(--border); }
-  .stat:last-child { border-right: none; }
-  .stat-label { font-size: 11px; color: var(--ink3); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 2px; }
-  .stat-val { font-size: 20px; font-weight: 500; font-variant-numeric: tabular-nums; }
+/* STATS */
+.statsbar { display: none; background: var(--card); border-bottom: 1px solid var(--border); }
+.stats { max-width: 1200px; margin: 0 auto; padding: 0 2rem; display: flex; flex-wrap: wrap; }
+.stat { padding: 0.8rem 1.25rem 0.8rem 0; margin-right: 1.25rem; border-right: 1px solid var(--border); }
+.stat:last-child { border-right: none; }
+.slabel { font-size: 10px; color: var(--ink3); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 2px; }
+.sval { font-size: 19px; font-weight: 500; }
 
-  /* ── TOOLBAR ── */
-  .toolbar { display: none; max-width: 1200px; margin: 0 auto; padding: 1rem 2rem; gap: 10px; align-items: center; flex-wrap: wrap; }
-  .search-wrap { flex: 1; min-width: 180px; position: relative; }
-  .search-wrap svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; color: var(--ink3); pointer-events: none; }
-  .search-wrap input { width: 100%; height: 38px; padding: 0 12px 0 36px; border: 1px solid var(--border); border-radius: 50px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--ink); background: var(--card); outline: none; }
-  .search-wrap input:focus { border-color: var(--rose); }
-  .search-wrap input::placeholder { color: var(--ink3); }
-  select.sort { height: 38px; padding: 0 12px; border: 1px solid var(--border); border-radius: 50px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--ink); background: var(--card); cursor: pointer; outline: none; }
-  .vtoggle { display: flex; border: 1px solid var(--border); border-radius: 50px; overflow: hidden; }
-  .vbtn { width: 38px; height: 38px; border: none; background: var(--card); cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--ink3); }
-  .vbtn.on { background: var(--ink); color: #fff; }
-  .vbtn svg { width: 15px; height: 15px; }
-  .rcount { font-size: 13px; color: var(--ink3); white-space: nowrap; }
-  .csv-btn { height: 38px; padding: 0 14px; border: 1px solid var(--border); border-radius: 50px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--ink2); background: var(--card); cursor: pointer; display: flex; align-items: center; gap: 5px; white-space: nowrap; }
-  .csv-btn:hover { border-color: var(--ink); }
+/* TOOLBAR */
+.toolbar { display: none; max-width: 1200px; margin: 0 auto; padding: 1rem 2rem; gap: 8px; align-items: center; flex-wrap: wrap; }
+.sw { flex: 1; min-width: 160px; position: relative; }
+.sw svg { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; color: var(--ink3); pointer-events: none; }
+.sw input { width: 100%; height: 38px; padding: 0 11px 0 34px; border: 1px solid var(--border); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--ink); background: var(--card); outline: none; }
+.sw input:focus { border-color: var(--rose); }
+.sw input::placeholder { color: var(--ink3); }
+select.ss { height: 38px; padding: 0 11px; border: 1px solid var(--border); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--ink); background: var(--card); outline: none; cursor: pointer; }
+.vtog { display: flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.vb { width: 38px; height: 38px; border: none; background: var(--card); cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--ink3); }
+.vb.on { background: var(--ink); color: #fff; }
+.vb svg { width: 15px; height: 15px; }
+.rc { font-size: 12px; color: var(--ink3); white-space: nowrap; }
+.csvbtn { height: 38px; padding: 0 13px; border: 1px solid var(--border); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 12px; color: var(--ink2); background: var(--card); cursor: pointer; display: flex; align-items: center; gap: 5px; white-space: nowrap; }
+.csvbtn:hover { border-color: var(--ink); }
 
-  /* ── MAIN ── */
-  .main { max-width: 1200px; margin: 0 auto; padding: 1.5rem 2rem 3rem; }
+/* MAIN */
+.main { max-width: 1200px; margin: 0 auto; padding: 1.25rem 2rem 3rem; }
 
-  /* ── GRID ── */
-  .pgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
-  .pcard { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; text-decoration: none; color: inherit; display: block; transition: transform 0.15s, box-shadow 0.15s; }
-  .pcard:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.07); }
-  .pcard-img { width: 100%; aspect-ratio: 1; object-fit: cover; background: #f0ede8; display: block; }
-  .pcard-ph { width: 100%; aspect-ratio: 1; background: #f0ede8; display: flex; align-items: center; justify-content: center; font-size: 32px; }
-  .pcard-body { padding: 10px 12px 12px; }
-  .pcard-brand { font-size: 10px; color: var(--ink3); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px; }
-  .pcard-title { font-size: 13px; font-weight: 500; line-height: 1.4; margin-bottom: 8px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.6em; }
-  .pcard-foot { display: flex; align-items: center; justify-content: space-between; }
-  .price { font-size: 14px; font-weight: 500; }
-  .price.free { color: var(--sage); }
-  .lk { font-size: 12px; color: var(--ink3); display: flex; align-items: center; gap: 3px; }
-  .lk svg { width: 11px; height: 11px; }
+/* GRID */
+.pgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
+.pc { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; text-decoration: none; color: inherit; display: block; transition: transform 0.15s, box-shadow 0.15s; }
+.pc:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.07); }
+.pc img { width: 100%; aspect-ratio: 1; object-fit: cover; background: #f0ede8; display: block; }
+.pc-ph { width: 100%; aspect-ratio: 1; background: #f0ede8; display: flex; align-items: center; justify-content: center; font-size: 32px; }
+.pc-body { padding: 10px 12px 12px; }
+.pc-brand { font-size: 10px; color: var(--ink3); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px; }
+.pc-title { font-size: 13px; font-weight: 500; line-height: 1.4; margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 2.4em; }
+.pc-desc { font-size: 11px; color: var(--ink3); line-height: 1.4; margin-bottom: 8px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 0; }
+.pc-foot { display: flex; align-items: center; justify-content: space-between; }
+.pr { font-size: 14px; font-weight: 500; }
+.pr.free { color: var(--sage); }
+.lk { font-size: 11px; color: var(--ink3); display: flex; align-items: center; gap: 3px; }
+.lk svg { width: 11px; height: 11px; }
 
-  /* ── LIST ── */
-  .plist-wrap { display: flex; flex-direction: column; gap: 5px; }
-  .pli { background: var(--card); border: 1px solid var(--border); border-radius: 10px; display: flex; align-items: center; gap: 12px; padding: 9px 12px; text-decoration: none; color: inherit; transition: background 0.1s; }
-  .pli:hover { background: #fdfcfa; }
-  .pli-thumb { width: 50px; height: 50px; border-radius: 7px; object-fit: cover; flex-shrink: 0; background: #f0ede8; display: block; }
-  .pli-ph { width: 50px; height: 50px; border-radius: 7px; background: #f0ede8; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 18px; }
-  .pli-info { flex: 1; min-width: 0; }
-  .pli-title { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .pli-sub { font-size: 11px; color: var(--ink3); margin-top: 2px; }
-  .pli-price { font-size: 14px; font-weight: 500; white-space: nowrap; flex-shrink: 0; }
-  .pli-price.free { color: var(--sage); }
-  .pli-lk { font-size: 11px; color: var(--ink3); flex-shrink: 0; display: flex; align-items: center; gap: 2px; min-width: 32px; justify-content: flex-end; }
-  .pli-lk svg { width: 11px; height: 11px; }
-  .pli-arr { color: var(--ink3); flex-shrink: 0; }
-  .pli-arr svg { width: 15px; height: 15px; }
+/* LIST */
+.plist { display: flex; flex-direction: column; gap: 5px; }
+.pl { background: var(--card); border: 1px solid var(--border); border-radius: 10px; display: flex; align-items: flex-start; gap: 12px; padding: 10px 12px; text-decoration: none; color: inherit; transition: background 0.1s; }
+.pl:hover { background: #fdfcfa; }
+.pl img { width: 56px; height: 56px; border-radius: 7px; object-fit: cover; flex-shrink: 0; background: #f0ede8; display: block; }
+.pl-ph { width: 56px; height: 56px; border-radius: 7px; background: #f0ede8; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+.pl-info { flex: 1; min-width: 0; }
+.pl-title { font-size: 13px; font-weight: 500; line-height: 1.3; margin-bottom: 3px; }
+.pl-desc { font-size: 12px; color: var(--ink3); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 4px; }
+.pl-sub { font-size: 11px; color: var(--ink3); }
+.pl-right { flex-shrink: 0; text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.pl-price { font-size: 14px; font-weight: 500; white-space: nowrap; }
+.pl-price.free { color: var(--sage); }
+.pl-lk { font-size: 11px; color: var(--ink3); display: flex; align-items: center; gap: 3px; }
+.pl-lk svg { width: 11px; height: 11px; }
 
-  /* ── SKELETON ── */
-  .skel-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
-  @keyframes sh { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
-  .sk { background: linear-gradient(90deg,#f0ede8 25%,#e8e4de 50%,#f0ede8 75%); background-size: 200% 100%; animation: sh 1.4s infinite; }
-  .sk-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; }
-  .sk-img { width: 100%; aspect-ratio: 1; }
-  .sk-body { padding: 10px 12px 12px; }
-  .sk-line { height: 11px; border-radius: 5px; margin-bottom: 7px; }
-  .sk-line.s { width: 55%; }
+/* SKELETON */
+.sgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
+@keyframes sh { 0%{background-position:200% 0}100%{background-position:-200% 0} }
+.sk { background: linear-gradient(90deg,#f0ede8 25%,#e5e0d8 50%,#f0ede8 75%); background-size: 200% 100%; animation: sh 1.5s infinite; }
+.sk-c { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; }
+.sk-img { width: 100%; aspect-ratio: 1; }
+.sk-bd { padding: 10px 12px 12px; }
+.sk-ln { height: 11px; border-radius: 5px; margin-bottom: 7px; }
+.sk-s { width: 55%; }
 
-  /* ── EMPTY / ERROR ── */
-  .empty { text-align: center; padding: 3rem 1rem; color: var(--ink3); font-size: 14px; }
-  .err { background: #fff0ee; border: 1px solid #f5c4b3; border-radius: 10px; padding: 1.1rem 1.4rem; color: #993c1d; font-size: 14px; line-height: 1.6; }
-  .err strong { display: block; margin-bottom: 3px; }
+/* LANDING */
+.landing { text-align: center; padding: 5rem 2rem 3rem; }
+.landing h2 { font-family: 'DM Serif Display', serif; font-size: clamp(1.8rem,5vw,2.8rem); line-height: 1.15; margin-bottom: 0.75rem; }
+.landing h2 em { color: var(--rose); font-style: italic; }
+.landing p { color: var(--ink3); font-size: 15px; max-width: 400px; margin: 0 auto 1.5rem; line-height: 1.6; }
+.eg { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.eg button { background: var(--card); border: 1px solid var(--border); border-radius: 50px; padding: 6px 14px; font-family: 'DM Sans', sans-serif; font-size: 12px; color: var(--ink2); cursor: pointer; }
+.eg button:hover { border-color: var(--rose); color: var(--rose); }
 
-  /* ── LANDING ── */
-  .landing { text-align: center; padding: 4rem 2rem; }
-  .landing h2 { font-family: 'DM Serif Display', serif; font-size: 2rem; margin-bottom: 0.75rem; }
-  .landing h2 em { color: var(--rose); font-style: italic; }
-  .landing p { color: var(--ink3); font-size: 15px; max-width: 420px; margin: 0 auto; line-height: 1.6; }
+.err { background: #fff0ee; border: 1px solid #f5c4b3; border-radius: 10px; padding: 1rem 1.25rem; color: #993c1d; font-size: 14px; line-height: 1.6; }
+.err strong { display: block; margin-bottom: 3px; font-size: 15px; }
+.empty { text-align: center; padding: 3rem; color: var(--ink3); font-size: 14px; }
 
-  @media (max-width: 640px) {
-    .hdr, .url-section, .shop-meta, .main { padding-left: 1rem; padding-right: 1rem; }
-    .stats-inner, .toolbar { padding-left: 1rem; padding-right: 1rem; }
-    .stat { border-right: none; }
-    .url-row { flex-direction: column; }
-    .url-input, .go-btn { width: 100%; border-radius: 10px; }
-  }
+@media (max-width: 640px) {
+  .hdr, .urlbar, .shopinfo, .main { padding-left: 1rem; padding-right: 1rem; }
+  .stats, .toolbar { padding-left: 1rem; padding-right: 1rem; }
+  .stat { border-right: none; }
+  .urlrow { flex-direction: column; }
+}
 </style>
 </head>
 <body>
 
 <header class="hdr">
-  <a class="hdr-brand" href="#">Yaga <em>Shop</em> Browser</a>
+  <a class="brand" href="/" onclick="reset();return false;">Yaga <em>Shop</em> Browser</a>
 </header>
 
-<div class="url-section">
-  <div class="url-row">
-    <input class="url-input" id="shopUrl" type="url"
+<div class="urlbar">
+  <div class="urlrow">
+    <input class="urlinput" id="shopUrl" type="url"
       placeholder="https://www.yaga.co.za/craftyandbookish"
-      value=""
-      onkeydown="if(event.key==='Enter') go()">
-    <button class="go-btn" id="goBtn" onclick="go()">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      Browse shop
-    </button>
+      onkeydown="if(event.key==='Enter')go()">
+    <button class="gobtn" id="goBtn" onclick="go()">Browse shop</button>
   </div>
-  <div class="url-hint">Paste any Yaga shop URL — e.g. https://www.yaga.co.za/what-a-great-find</div>
+  <div class="urlhint">Works with any Yaga shop URL</div>
 </div>
 
-<div class="prog-wrap" id="progWrap">
+<div class="prog" id="prog">
   <div class="prog-track"><div class="prog-fill" id="progFill"></div></div>
   <div class="prog-label" id="progLabel">Starting...</div>
 </div>
 
-<div class="shop-meta" id="shopMeta">
-  <div class="shop-meta-inner">
-    <img class="shop-avatar" id="shopAvatar" src="" alt="">
+<div class="shopinfo" id="shopInfo">
+  <div class="shopinfo-inner">
+    <img class="shopavatar" id="shopAvatar" src="" alt="">
     <div>
-      <div class="shop-name" id="shopName"></div>
-      <div class="shop-sub" id="shopSub"></div>
+      <div class="shopname" id="shopName"></div>
+      <div class="shopsub" id="shopSub"></div>
     </div>
   </div>
 </div>
 
-<div class="stats-bar" id="statsBar">
-  <div class="stats-inner">
-    <div class="stat"><div class="stat-label">Products</div><div class="stat-val" id="sTotal">—</div></div>
-    <div class="stat"><div class="stat-label">Total value</div><div class="stat-val" id="sValue">—</div></div>
-    <div class="stat"><div class="stat-label">Avg price</div><div class="stat-val" id="sAvg">—</div></div>
-    <div class="stat"><div class="stat-label">Total likes</div><div class="stat-val" id="sLikes">—</div></div>
+<div class="statsbar" id="statsBar">
+  <div class="stats">
+    <div class="stat"><div class="slabel">Products</div><div class="sval" id="sN">—</div></div>
+    <div class="stat"><div class="slabel">Total value</div><div class="sval" id="sV">—</div></div>
+    <div class="stat"><div class="slabel">Avg price</div><div class="sval" id="sA">—</div></div>
+    <div class="stat"><div class="slabel">Total likes</div><div class="sval" id="sL">—</div></div>
   </div>
 </div>
 
 <div class="toolbar" id="toolbar">
-  <div class="search-wrap">
+  <div class="sw">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-    <input type="text" id="search" placeholder="Search..." oninput="render()">
+    <input type="text" id="search" placeholder="Search titles and descriptions..." oninput="render()">
   </div>
-  <select class="sort" id="sortSel" onchange="render()">
+  <select class="ss" id="srt" onchange="render()">
     <option value="listedAt_desc">Newest first</option>
     <option value="listedAt_asc">Oldest first</option>
     <option value="price_asc">Price: low → high</option>
@@ -201,217 +197,240 @@
     <option value="likeCount_desc">Most liked</option>
     <option value="title_asc">Title A–Z</option>
   </select>
-  <div class="vtoggle">
-    <button class="vbtn on" id="gBtn" onclick="setView('grid')" title="Grid">
+  <div class="vtog">
+    <button class="vb on" id="gBtn" onclick="setView('grid')" title="Grid">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
     </button>
-    <button class="vbtn" id="lBtn" onclick="setView('list')" title="List">
+    <button class="vb" id="lBtn" onclick="setView('list')" title="List">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
     </button>
   </div>
-  <span class="rcount" id="rcount"></span>
-  <button class="csv-btn" onclick="exportCSV()">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-    Export CSV
+  <span class="rc" id="rc"></span>
+  <button class="csvbtn" onclick="exportCSV()">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+    CSV
   </button>
 </div>
 
 <main class="main" id="main">
   <div class="landing">
     <h2>Browse any<br><em>Yaga shop</em></h2>
-    <p>Paste a shop URL above to load every listing with titles, prices, and images — no endless scrolling.</p>
+    <p>Paste a shop URL above — every listing loads with full title, description, and images. Search across everything.</p>
+    <div class="eg">
+      <button onclick="loadShop('https://www.yaga.co.za/craftyandbookish')">craftyandbookish</button>
+      <button onclick="loadShop('https://www.yaga.co.za/what-a-great-find')">what-a-great-find</button>
+    </div>
   </div>
 </main>
 
 <script>
 const LIMIT = 32;
-const CONCURRENCY = 8;
-let allProducts = [];
-let shopSlug = '';
-let viewMode = 'grid';
+const CONC = 10;
+let products = [];
+let slug = '';
+let view = 'grid';
 let busy = false;
 
-// Route all fetches through the Netlify proxy function
-function proxyFetch(url) {
+function px(url) {
   return fetch('/proxy?url=' + encodeURIComponent(url))
-    .then(r => { if (!r.ok) throw new Error('Proxy error ' + r.status); return r.text(); });
+    .then(r => { if (!r.ok) throw new Error('Proxy ' + r.status); return r.text(); });
 }
+function pxJson(url) { return px(url).then(t => JSON.parse(t)); }
 
-function apiGet(url) {
-  return proxyFetch(url).then(text => JSON.parse(text));
-}
+// Extract title AND full description from __NEXT_DATA__ in product page HTML
+function extractFromHtml(html) {
+  // Pull __NEXT_DATA__ JSON
+  const m = html.match(/<script id="__NEXT_DATA__"[^>]*>([\s\S]*?)<\/script>/);
+  if (m) {
+    try {
+      const nd = JSON.parse(m[1]);
+      const prod = nd?.props?.pageProps?.initialProduct
+                || nd?.props?.pageProps?.product
+                || nd?.props?.pageProps?.data;
+      if (prod) {
+        const title = prod.title || prod.name || null;
+        const description = prod.description || null;
+        const condition = prod.condition || null;
+        const category = prod.categoryName || prod.category || null;
+        if (title || description) return { title, description, condition, category };
+      }
+      // Sometimes it's nested differently — scan all "description" keys
+      const raw = m[1];
+      const descMatch = raw.match(/"description"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+      const titleMatch = raw.match(/"title"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+      if (titleMatch || descMatch) {
+        return {
+          title: titleMatch ? titleMatch[1].replace(/\\n/g,' ').replace(/\\"/g,'"').trim() : null,
+          description: descMatch ? descMatch[1].replace(/\\n/g,'\n').replace(/\\"/g,'"').trim() : null,
+          condition: null, category: null
+        };
+      }
+    } catch {}
+  }
 
-// Extract title from individual product page HTML
-// Yaga puts title+description in: <div class="...description..."><p>TITLE\nDESCRIPTION</p></div>
-function extractTitle(html) {
-  // Try og:title meta first — cleanest
-  const og = html.match(/<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)["']/i)
-            || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:title["']/i);
+  // Fallback: og:description contains the full description text
+  const og = html.match(/<meta[^>]+property=["']og:description["'][^>]+content=["']([^"']{5,})["']/i)
+           || html.match(/<meta[^>]+content=["']([^"']{5,})["'][^>]+property=["']og:description["']/i);
   if (og) {
-    const t = og[1].replace(' | Yaga', '').replace(' | YAGA', '').trim();
-    if (t && t.length > 3 && !t.toLowerCase().includes('marketplace')) return t;
+    const full = og[1].replace(/&#x27;/g,"'").replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').trim();
+    const lines = full.split('\n').map(s => s.trim()).filter(Boolean);
+    return { title: lines[0] || null, description: full, condition: null, category: null };
   }
 
-  // Try __NEXT_DATA__ title field
-  const nd = html.match(/"title"\s*:\s*"([^"]{3,})"/);
-  if (nd) return nd[1].replace(/\\n/g,' ').trim();
-
-  // Try description div first <p>
-  const desc = html.match(/class="[^"]*description[^"]*"[^>]*>\s*<p[^>]*>([\s\S]{3,300}?)<\/p>/i);
-  if (desc) {
-    const lines = desc[1].replace(/<[^>]+>/g,'').split('\n').map(s=>s.trim()).filter(Boolean);
-    if (lines[0] && lines[0].length > 3) return lines[0];
-  }
-
-  return null;
+  return { title: null, description: null, condition: null, category: null };
 }
 
-function setProgress(pct, label) {
+function setP(pct, label) {
   document.getElementById('progFill').style.width = pct + '%';
   document.getElementById('progLabel').textContent = label;
 }
 
-function showSkeletons(n) {
-  const cards = Array.from({length: Math.min(n, 32)}, () =>
-    `<div class="sk-card"><div class="sk-img sk"></div><div class="sk-body"><div class="sk-line sk s"></div><div class="sk-line sk"></div><div class="sk-line sk s"></div></div></div>`
-  ).join('');
-  document.getElementById('main').innerHTML = `<div class="skel-grid">${cards}</div>`;
+function skelGrid(n) {
+  return `<div class="sgrid">${Array.from({length:Math.min(n,32)},()=>
+    `<div class="sk-c"><div class="sk-img sk"></div><div class="sk-bd"><div class="sk-ln sk sk-s"></div><div class="sk-ln sk"></div><div class="sk-ln sk sk-s"></div></div></div>`
+  ).join('')}</div>`;
 }
 
-async function batchMap(items, fn, concurrency, onProgress) {
-  const results = new Array(items.length);
+async function batchMap(items, fn, conc, onProg) {
+  const res = new Array(items.length);
   let idx = 0, done = 0;
-  async function worker() {
+  const worker = async () => {
     while (idx < items.length) {
       const i = idx++;
-      results[i] = await fn(items[i], i);
-      onProgress && onProgress(++done, items.length);
+      res[i] = await fn(items[i], i);
+      onProg && onProg(++done, items.length);
     }
-  }
-  await Promise.all(Array.from({length: Math.min(concurrency, items.length)}, worker));
-  return results;
+  };
+  await Promise.all(Array.from({length: Math.min(conc, items.length)}, worker));
+  return res;
+}
+
+function loadShop(url) {
+  document.getElementById('shopUrl').value = url;
+  go();
+}
+
+function reset() {
+  products = [];
+  slug = '';
+  document.getElementById('shopInfo').style.display = 'none';
+  document.getElementById('statsBar').style.display = 'none';
+  document.getElementById('toolbar').style.display = 'none';
+  document.getElementById('prog').style.display = 'none';
+  document.getElementById('main').innerHTML = `<div class="landing">
+    <h2>Browse any<br><em>Yaga shop</em></h2>
+    <p>Paste a shop URL above — every listing loads with full title, description, and images.</p>
+    <div class="eg">
+      <button onclick="loadShop('https://www.yaga.co.za/craftyandbookish')">craftyandbookish</button>
+      <button onclick="loadShop('https://www.yaga.co.za/what-a-great-find')">what-a-great-find</button>
+    </div>
+  </div>`;
 }
 
 async function go() {
   if (busy) return;
-
   let raw = document.getElementById('shopUrl').value.trim();
   if (!raw) return;
-
-  // Normalise — strip trailing slash, ensure https
   if (!raw.startsWith('http')) raw = 'https://' + raw;
   raw = raw.replace(/\/$/, '');
 
-  // Extract slug from URL
   const m = raw.match(/yaga\.co\.za\/([^/?#]+)/);
-  if (!m) {
-    showError('That doesn\'t look like a Yaga shop URL. Try: https://www.yaga.co.za/craftyandbookish');
-    return;
-  }
-  shopSlug = m[1];
+  if (!m) { showErr('Not a valid Yaga shop URL. Example: https://www.yaga.co.za/craftyandbookish'); return; }
+  slug = m[1];
 
   busy = true;
   document.getElementById('goBtn').disabled = true;
-  document.getElementById('progWrap').style.display = 'block';
+  document.getElementById('prog').style.display = 'block';
   document.getElementById('statsBar').style.display = 'none';
   document.getElementById('toolbar').style.display = 'none';
-  document.getElementById('shopMeta').style.display = 'none';
-  allProducts = [];
-  setProgress(3, 'Connecting to Yaga...');
+  document.getElementById('shopInfo').style.display = 'none';
+  products = [];
+  setP(3, 'Loading shop page...');
 
   try {
-    // Step 1: get shop info + first page
-    const firstUrl = `https://www.yaga.co.za/api/product/?shopId=&shopSlug=${shopSlug}&status=published&offset=0&limit=${LIMIT}`;
-
-    // We need the shopId — get it from the shop page JSON
-    setProgress(6, 'Loading shop...');
-    const shopPageHtml = await proxyFetch(`https://www.yaga.co.za/${shopSlug}`);
-
-    // Extract shopId and shop info from __NEXT_DATA__
-    const ndMatch = shopPageHtml.match(/<script id="__NEXT_DATA__"[^>]*>([\s\S]*?)<\/script>/);
-    if (!ndMatch) throw new Error('Could not read shop data. Is this a valid Yaga shop URL?');
-
-    const nd = JSON.parse(ndMatch[1]);
+    // Step 1: get shop page to find shopId and shop info
+    const shopHtml = await px(`https://www.yaga.co.za/${slug}`);
+    const ndM = shopHtml.match(/<script id="__NEXT_DATA__"[^>]*>([\s\S]*?)<\/script>/);
+    if (!ndM) throw new Error('Could not read shop data — is this a valid Yaga shop URL?');
+    const nd = JSON.parse(ndM[1]);
     const shopData = nd?.props?.pageProps?.initialShop;
-    if (!shopData) throw new Error('Shop not found. Check the URL and try again.');
+    if (!shopData) throw new Error('Shop not found. Check the URL.');
 
     const shopId = shopData.id;
-    const shopName = shopData.name || shopSlug;
-    const shopLocation = [shopData.location, shopData.province].filter(Boolean).join(', ');
-    const ownerPic = shopData.owner?.picture || shopData.owner?.profilePicture?.url || '';
-    const productCount = nd?.props?.pageProps?.initialProducts?.length || '?';
+    const shopName = shopData.name || slug;
+    const shopLoc = [shopData.location, shopData.province].filter(Boolean).join(', ');
+    const pic = shopData.owner?.picture || shopData.owner?.profilePicture?.url || '';
 
-    // Show shop meta
     document.getElementById('shopName').textContent = shopName;
-    document.getElementById('shopSub').textContent = shopLocation + (shopData.completedOrdersCount ? ` · ${shopData.completedOrdersCount} orders` : '');
-    if (ownerPic) document.getElementById('shopAvatar').src = ownerPic;
-    document.getElementById('shopMeta').style.display = 'block';
+    document.getElementById('shopSub').textContent = [shopLoc, shopData.completedOrdersCount ? shopData.completedOrdersCount + ' orders' : '', shopData.avgRating ? '★ ' + shopData.avgRating : ''].filter(Boolean).join(' · ');
+    if (pic) document.getElementById('shopAvatar').src = pic;
+    document.getElementById('shopInfo').style.display = 'block';
 
-    setProgress(12, `Found shop: ${shopName} — fetching all products...`);
+    setP(10, `Found "${shopName}" — fetching all products...`);
 
-    // Step 2: get all product stubs via API
-    const first = await apiGet(`https://www.yaga.co.za/api/product/?shopId=${shopId}&status=published&offset=0&limit=${LIMIT}`);
+    // Step 2: paginate through all product stubs
+    const first = await pxJson(`https://www.yaga.co.za/api/product/?shopId=${shopId}&status=published&offset=0&limit=${LIMIT}`);
     const total = first.data.total;
     const offsets = Array.from({length: Math.ceil(total / LIMIT)}, (_, i) => i * LIMIT);
 
-    showSkeletons(total);
-    setProgress(18, `${total} products found — loading pages...`);
+    document.getElementById('main').innerHTML = skelGrid(total);
+    setP(18, `${total} products — loading pages...`);
 
     const pages = await Promise.all(offsets.map(o =>
-      apiGet(`https://www.yaga.co.za/api/product/?shopId=${shopId}&status=published&offset=${o}&limit=${LIMIT}`)
+      pxJson(`https://www.yaga.co.za/api/product/?shopId=${shopId}&status=published&offset=${o}&limit=${LIMIT}`)
         .then(d => d.data.list)
     ));
     const stubs = pages.flat();
 
-    setProgress(28, `Fetching titles for ${stubs.length} products...`);
+    setP(28, `Fetching title & description for ${stubs.length} products...`);
 
-    // Step 3: fetch each product page HTML to extract title
-    const titles = await batchMap(
+    // Step 3: fetch EACH product page HTML — extract title + full description
+    const details = await batchMap(
       stubs,
       async stub => {
         try {
-          const html = await proxyFetch(`https://www.yaga.co.za/${shopSlug}/${stub.slug}`);
-          return extractTitle(html);
-        } catch { return null; }
+          const html = await px(`https://www.yaga.co.za/${slug}/product/${stub.slug}`);
+          return extractFromHtml(html);
+        } catch {
+          return { title: null, description: null, condition: null, category: null };
+        }
       },
-      CONCURRENCY,
-      (done, tot) => setProgress(28 + Math.round((done / tot) * 70), `Loading titles... ${done} / ${tot}`)
+      CONC,
+      (done, tot) => setP(28 + Math.round((done / tot) * 70), `Loading product details... ${done} / ${tot}`)
     );
 
-    allProducts = stubs.map((s, i) => ({ ...s, title: titles[i] }));
+    products = stubs.map((s, i) => ({ ...s, ...details[i] }));
 
-    setProgress(100, 'Done!');
-    setTimeout(() => { document.getElementById('progWrap').style.display = 'none'; }, 500);
+    setP(100, 'Done!');
+    setTimeout(() => { document.getElementById('prog').style.display = 'none'; }, 500);
 
     // Stats
-    const priced = allProducts.filter(p => p.price > 0);
-    const totalVal = allProducts.reduce((s, p) => s + p.price, 0);
-    document.getElementById('sTotal').textContent = allProducts.length;
-    document.getElementById('sValue').textContent = 'R' + totalVal.toLocaleString('en-ZA');
-    document.getElementById('sAvg').textContent = priced.length ? 'R' + Math.round(totalVal / priced.length) : 'R0';
-    document.getElementById('sLikes').textContent = allProducts.reduce((s, p) => s + (p.likeCount || 0), 0);
-
+    const priced = products.filter(p => p.price > 0);
+    const tv = products.reduce((s, p) => s + p.price, 0);
+    document.getElementById('sN').textContent = products.length;
+    document.getElementById('sV').textContent = 'R' + tv.toLocaleString('en-ZA');
+    document.getElementById('sA').textContent = priced.length ? 'R' + Math.round(tv / priced.length) : 'R0';
+    document.getElementById('sL').textContent = products.reduce((s, p) => s + (p.likeCount || 0), 0);
     document.getElementById('statsBar').style.display = 'block';
     document.getElementById('toolbar').style.display = 'flex';
     render();
 
   } catch (e) {
-    setProgress(0, '');
-    document.getElementById('progWrap').style.display = 'none';
-    showError(e.message);
+    setP(0, '');
+    document.getElementById('prog').style.display = 'none';
+    showErr(e.message);
     console.error(e);
   }
-
   busy = false;
   document.getElementById('goBtn').disabled = false;
 }
 
-function showError(msg) {
-  document.getElementById('main').innerHTML = `<div class="err"><strong>Something went wrong</strong>${msg}</div>`;
+function showErr(msg) {
+  document.getElementById('main').innerHTML = `<div class="err"><strong>Could not load shop</strong>${msg}</div>`;
 }
 
 function setView(v) {
-  viewMode = v;
+  view = v;
   document.getElementById('gBtn').classList.toggle('on', v === 'grid');
   document.getElementById('lBtn').classList.toggle('on', v === 'list');
   render();
@@ -419,10 +438,13 @@ function setView(v) {
 
 function render() {
   const q = document.getElementById('search').value.toLowerCase();
-  const [sf, sd] = document.getElementById('sortSel').value.split('_');
+  const [sf, sd] = document.getElementById('srt').value.split('_');
 
-  let list = allProducts.filter(p =>
-    !q || (p.title||'').toLowerCase().includes(q) || (p.brand||'').toLowerCase().includes(q)
+  let list = products.filter(p => !q ||
+    (p.title||'').toLowerCase().includes(q) ||
+    (p.description||'').toLowerCase().includes(q) ||
+    (p.brand||'').toLowerCase().includes(q) ||
+    (p.category||'').toLowerCase().includes(q)
   );
 
   list.sort((a, b) => {
@@ -431,68 +453,74 @@ function render() {
     return sd === 'asc' ? (av > bv ? 1 : -1) : (av < bv ? 1 : -1);
   });
 
-  document.getElementById('rcount').textContent = `${list.length} of ${allProducts.length}`;
-
+  document.getElementById('rc').textContent = `${list.length} of ${products.length}`;
   const main = document.getElementById('main');
   if (!list.length) { main.innerHTML = '<div class="empty">No products match your search.</div>'; return; }
-
-  main.innerHTML = viewMode === 'grid'
-    ? `<div class="pgrid">${list.map(cardHTML).join('')}</div>`
-    : `<div class="plist-wrap">${list.map(listHTML).join('')}</div>`;
+  main.innerHTML = view === 'grid'
+    ? `<div class="pgrid">${list.map(cardH).join('')}</div>`
+    : `<div class="plist">${list.map(listH).join('')}</div>`;
 }
 
 const hrt = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`;
-const arr = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>`;
 
-function e(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-function cardHTML(p) {
-  const url = `https://www.yaga.co.za/${shopSlug}/${p.slug}`;
+function cardH(p) {
+  const url = `https://www.yaga.co.za/${slug}/product/${p.slug}`;
   const img = p.images?.[0]?.thumbnail || '';
   const title = p.title || '(no title)';
-  const imgEl = img ? `<img class="pcard-img" src="${e(img)}" alt="${e(title)}" loading="lazy">` : `<div class="pcard-ph">🛍️</div>`;
-  const prEl = p.price === 0 ? `<span class="price free">Free</span>` : `<span class="price">R${p.price}</span>`;
-  return `<a class="pcard" href="${url}" target="_blank" rel="noopener">
+  // Show first line of description as subtitle
+  const descLine = p.description ? p.description.split('\n')[0].trim() : '';
+  const imgEl = img ? `<img src="${esc(img)}" alt="${esc(title)}" loading="lazy">` : `<div class="pc-ph">🛍️</div>`;
+  const prEl = p.price === 0 ? `<span class="pr free">Free</span>` : `<span class="pr">R${p.price}</span>`;
+  return `<a class="pc" href="${url}" target="_blank" rel="noopener">
     ${imgEl}
-    <div class="pcard-body">
-      ${p.brand ? `<div class="pcard-brand">${e(p.brand)}</div>` : ''}
-      <div class="pcard-title">${e(title)}</div>
-      <div class="pcard-foot">${prEl}<span class="lk">${hrt} ${p.likeCount||0}</span></div>
+    <div class="pc-body">
+      ${p.brand ? `<div class="pc-brand">${esc(p.brand)}</div>` : ''}
+      <div class="pc-title">${esc(title)}</div>
+      ${descLine ? `<div class="pc-desc">${esc(descLine)}</div>` : ''}
+      <div class="pc-foot">${prEl}<span class="lk">${hrt}${p.likeCount||0}</span></div>
     </div>
   </a>`;
 }
 
-function listHTML(p) {
-  const url = `https://www.yaga.co.za/${shopSlug}/${p.slug}`;
+function listH(p) {
+  const url = `https://www.yaga.co.za/${slug}/product/${p.slug}`;
   const img = p.images?.[0]?.thumbnail || '';
   const title = p.title || '(no title)';
+  const desc = p.description ? p.description.replace(/\n+/g, ' ').trim() : '';
   const date = p.listedAt ? new Date(p.listedAt).toLocaleDateString('en-ZA',{day:'numeric',month:'short',year:'numeric'}) : '';
-  const imgEl = img ? `<img class="pli-thumb" src="${e(img)}" alt="" loading="lazy">` : `<div class="pli-ph">🛍️</div>`;
-  const prEl = p.price === 0 ? `<span class="pli-price free">Free</span>` : `<span class="pli-price">R${p.price}</span>`;
-  return `<a class="pli" href="${url}" target="_blank" rel="noopener">
+  const imgEl = img ? `<img src="${esc(img)}" alt="" loading="lazy">` : `<div class="pl-ph">🛍️</div>`;
+  const prEl = p.price === 0 ? `<span class="pl-price free">Free</span>` : `<span class="pl-price">R${p.price}</span>`;
+  return `<a class="pl" href="${url}" target="_blank" rel="noopener">
     ${imgEl}
-    <div class="pli-info">
-      <div class="pli-title">${e(title)}</div>
-      <div class="pli-sub">${p.brand ? e(p.brand)+' · ' : ''}${date}</div>
+    <div class="pl-info">
+      <div class="pl-title">${esc(title)}</div>
+      ${desc ? `<div class="pl-desc">${esc(desc)}</div>` : ''}
+      <div class="pl-sub">${p.brand ? esc(p.brand)+' · ' : ''}${date}${p.condition ? ' · '+esc(p.condition) : ''}</div>
     </div>
-    ${prEl}
-    <span class="pli-lk">${hrt} ${p.likeCount||0}</span>
-    <span class="pli-arr">${arr}</span>
+    <div class="pl-right">
+      ${prEl}
+      <span class="pl-lk">${hrt}${p.likeCount||0}</span>
+    </div>
   </a>`;
 }
 
 function exportCSV() {
-  const rows = [['Title','Price','Likes','Brand','Listed','URL']];
-  allProducts.forEach(p => rows.push([
+  const rows = [['Title','Description','Price','Likes','Brand','Category','Condition','Listed','URL']];
+  products.forEach(p => rows.push([
     `"${(p.title||p.slug||'').replace(/"/g,'""')}"`,
+    `"${(p.description||'').replace(/\n/g,' ').replace(/"/g,'""')}"`,
     p.price, p.likeCount||0,
     `"${(p.brand||'').replace(/"/g,'""')}"`,
+    `"${(p.category||'').replace(/"/g,'""')}"`,
+    `"${(p.condition||'').replace(/"/g,'""')}"`,
     p.listedAt ? new Date(p.listedAt).toLocaleDateString('en-ZA') : '',
-    `https://www.yaga.co.za/${shopSlug}/${p.slug}`
+    `https://www.yaga.co.za/${slug}/product/${p.slug}`
   ]));
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([rows.map(r=>r.join(',')).join('\n')],{type:'text/csv'}));
-  a.download = `${shopSlug}.csv`;
+  a.download = `${slug}.csv`;
   a.click();
 }
 </script>
